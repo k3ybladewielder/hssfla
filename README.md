@@ -59,6 +59,104 @@ Install dependencies:
 uv pip install -r requirements.txt
 ```
 
+### Tutorial
+
+This tutorial presents a minimal example of how to use the **HSSFLA (Holistic Text Summarization with the Shuffled Frog-Leaping Algorithm)** to generate an extractive summary from a simple text.
+
+#### 0. Importing required libraries
+
+First, import the necessary functions from the project modules:
+
+```python
+from preprocessing import process_corpus_with_stemming
+from hssfla import hssfla
+```
+
+#### 1. Input text definition
+
+In this example, a fictitious *Lorem Ipsum* text is used only to demonstrate the method’s workflow. In a real scenario, this text may correspond to a single document or to the concatenation of multiple documents.
+
+```python
+corpus = """
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+"""
+```
+
+#### 2. Text preprocessing
+
+The text is segmented into sentences and transformed into vector representations (*embeddings*).
+The preprocessing step includes normalization, tokenization, and stemming.
+
+```python
+embeddings, preprocessed_sentences_list = process_corpus_with_stemming(
+    corpus,
+    use_max_pooling=False
+)
+```
+
+#### 3. HSSFLA parameter configuration
+
+The main hyperparameters of the algorithm are defined as follows:
+
+```python
+n_cycle = 10        # Number of global cycles
+pop_size = 200      # Population size
+n_iter = 25         # Number of iterations per memeplex
+n_memeplex = 5      # Number of memeplexes
+gamma = 0.5         # Mixing rate
+```
+
+Additional important parameters include:
+
+* `beta_min` and `beta_max`: control the intensity of the local search
+* `L`: maximum summary length (in sentences)
+* `epsilon`: small value to avoid division by zero
+
+#### 4. Running the summarization algorithm
+
+The HSSFLA is then executed to find the best subset of sentences that maximizes the overall summary quality.
+
+```python
+best_global_individual, best_global_fitness, best_sentences = hssfla(
+    embeddings,
+    preprocessed_sentences_list,
+    n_cycle=n_cycle,
+    n_iter=n_iter,
+    n_memeplex=n_memeplex,
+    beta_max=0.5,
+    beta_min=0.1,
+    L=L,
+    pop_size=pop_size,
+    gamma=gamma,
+    epsilon=1e-8
+)
+```
+
+* `best_global_individual`: binary solution indicating the selected sentences
+* `best_global_fitness`: fitness value of the best solution
+* `best_sentences`: list of sentences chosen for the summary
+
+#### 5. Final summary generation
+
+The selected sentences are concatenated to form the final extractive summary:
+
+```python
+candidate_summary = " ".join(best_sentences)
+print(candidate_summary)
+```
+
+The output is an extractive summary that preserves the original sentences, selected in a **holistic** manner by jointly considering relevance, redundancy, and information coverage.
+
+---
+
+💡 **Note**:
+For multi-document summarization, simply concatenate all documents into a single string (`corpus`) before the preprocessing step.
+
+
 # How to Cite
 ```
 @INPROCEEDINGS{248295,
