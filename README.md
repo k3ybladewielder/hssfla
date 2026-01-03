@@ -29,7 +29,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/hssfla.git
+git clone https://github.com/k3ybladewielder/hssfla.git
 cd hssfla
 ```
 
